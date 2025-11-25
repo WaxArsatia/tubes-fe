@@ -9,6 +9,8 @@ export const Route = createFileRoute("/auth/register")({
 	component: Register,
 });
 
+// Comment
+
 function Register() {
 	const fullNameId = useId();
 	const emailId = useId();
