@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as HistoryBawahRouteImport } from './routes/historyBawah'
 import { Route as HistoryAtasRouteImport } from './routes/historyAtas'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
@@ -18,6 +19,11 @@ import { Route as AuthLoginRouteImport } from './routes/auth/login'
 const QuizRoute = QuizRouteImport.update({
   id: '/quiz',
   path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryBawahRoute = HistoryBawahRouteImport.update({
+  id: '/historyBawah',
+  path: '/historyBawah',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryAtasRoute = HistoryAtasRouteImport.update({
@@ -44,6 +50,7 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/historyAtas': typeof HistoryAtasRoute
+  '/historyBawah': typeof HistoryBawahRoute
   '/quiz': typeof QuizRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/historyAtas': typeof HistoryAtasRoute
+  '/historyBawah': typeof HistoryBawahRoute
   '/quiz': typeof QuizRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -59,19 +67,33 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/historyAtas': typeof HistoryAtasRoute
+  '/historyBawah': typeof HistoryBawahRoute
   '/quiz': typeof QuizRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/historyAtas' | '/quiz' | '/auth/login' | '/auth/register'
+  fullPaths:
+    | '/'
+    | '/historyAtas'
+    | '/historyBawah'
+    | '/quiz'
+    | '/auth/login'
+    | '/auth/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/historyAtas' | '/quiz' | '/auth/login' | '/auth/register'
+  to:
+    | '/'
+    | '/historyAtas'
+    | '/historyBawah'
+    | '/quiz'
+    | '/auth/login'
+    | '/auth/register'
   id:
     | '__root__'
     | '/'
     | '/historyAtas'
+    | '/historyBawah'
     | '/quiz'
     | '/auth/login'
     | '/auth/register'
@@ -80,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HistoryAtasRoute: typeof HistoryAtasRoute
+  HistoryBawahRoute: typeof HistoryBawahRoute
   QuizRoute: typeof QuizRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
@@ -92,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/quiz'
       fullPath: '/quiz'
       preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/historyBawah': {
+      id: '/historyBawah'
+      path: '/historyBawah'
+      fullPath: '/historyBawah'
+      preLoaderRoute: typeof HistoryBawahRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/historyAtas': {
@@ -128,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HistoryAtasRoute: HistoryAtasRoute,
+  HistoryBawahRoute: HistoryBawahRoute,
   QuizRoute: QuizRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
