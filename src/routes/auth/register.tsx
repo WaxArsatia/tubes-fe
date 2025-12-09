@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Lock, LogIn, Mail, User } from "lucide-react";
-import { useId } from "react";
+import { useId, useState } from "react";
 
 export const Route = createFileRoute("/auth/register")({
   component: Register,
@@ -12,11 +12,32 @@ function Register() {
   const passwordId = useId();
   const confirmPasswordId = useId();
 
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | undefined>();
+
+  const validatePasswords = (pass: string, confirm: string) => {
+    if (confirm && pass !== confirm) {
+      setPasswordError("Passwords do not match");
+      return false;
+    }
+    setPasswordError(undefined);
+    return true;
+  };
+
   return (
     <div className="flex min-h-screen">
       <div className="w-1/2 bg-gray-300"></div>
       <div className="flex items-center justify-center w-1/2 px-12 bg-gray-100">
-        <form className="flex flex-col w-sm">
+        <form
+          className="flex flex-col w-sm"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!validatePasswords(password, confirmPassword)) {
+              return;
+            }
+          }}
+        >
           <h1 className="mb-4 text-2xl font-bold text-center">
             Sign up for an account
           </h1>
@@ -62,6 +83,11 @@ function Register() {
                 id={passwordId}
                 autoComplete="new-password"
                 required
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  validatePasswords(e.target.value, confirmPassword);
+                }}
               />
             </div>
           </label>
@@ -80,8 +106,16 @@ function Register() {
                 id={confirmPasswordId}
                 autoComplete="new-password"
                 required
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  validatePasswords(password, e.target.value);
+                }}
               />
             </div>
+            {passwordError && (
+              <span className="mt-1 text-sm text-red-600">{passwordError}</span>
+            )}
           </label>
           <button
             type="submit"
