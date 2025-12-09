@@ -12,8 +12,14 @@ function Login() {
 
   return (
     <div className="flex min-h-screen">
-      <div className="w-1/2 bg-gray-300"></div>
-      <div className="flex items-center justify-center w-1/2 px-12 bg-gray-100">
+      <div className="items-center justify-center hidden bg-gray-300 min-w-1/2 lg:flex">
+        <img
+          src="/assets/undraw_authentication_1evl.svg"
+          alt="Login Illustration"
+          className="max-w-2xl"
+        />
+      </div>
+      <div className="flex items-center justify-center w-full px-12 bg-gray-100 lg:w-1/2 min-w-1/2">
         <form className="flex flex-col w-sm">
           <h1 className="mb-4 text-2xl font-bold text-center">
             Sign in to your account

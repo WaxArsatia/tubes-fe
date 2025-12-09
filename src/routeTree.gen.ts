@@ -9,40 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as QuizRouteImport } from './routes/quiz'
-import { Route as HistoryBawahRouteImport } from './routes/historyBawah'
-import { Route as HistoryAtasRouteImport } from './routes/historyAtas'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as User_settingUser_settingRouteImport } from './routes/user_setting/user_setting'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 
-const QuizRoute = QuizRouteImport.update({
-  id: '/quiz',
-  path: '/quiz',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HistoryBawahRoute = HistoryBawahRouteImport.update({
-  id: '/historyBawah',
-  path: '/historyBawah',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HistoryAtasRoute = HistoryAtasRouteImport.update({
-  id: '/historyAtas',
-  path: '/historyAtas',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const User_settingUser_settingRoute =
-  User_settingUser_settingRouteImport.update({
-    id: '/user_setting/user_setting',
-    path: '/user_setting/user_setting',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
   id: '/auth/register',
   path: '/auth/register',
@@ -56,107 +31,41 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/historyAtas': typeof HistoryAtasRoute
-  '/historyBawah': typeof HistoryBawahRoute
-  '/quiz': typeof QuizRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/user_setting/user_setting': typeof User_settingUser_settingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/historyAtas': typeof HistoryAtasRoute
-  '/historyBawah': typeof HistoryBawahRoute
-  '/quiz': typeof QuizRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/user_setting/user_setting': typeof User_settingUser_settingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/historyAtas': typeof HistoryAtasRoute
-  '/historyBawah': typeof HistoryBawahRoute
-  '/quiz': typeof QuizRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/user_setting/user_setting': typeof User_settingUser_settingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/historyAtas'
-    | '/historyBawah'
-    | '/quiz'
-    | '/auth/login'
-    | '/auth/register'
-    | '/user_setting/user_setting'
+  fullPaths: '/' | '/auth/login' | '/auth/register'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/historyAtas'
-    | '/historyBawah'
-    | '/quiz'
-    | '/auth/login'
-    | '/auth/register'
-    | '/user_setting/user_setting'
-  id:
-    | '__root__'
-    | '/'
-    | '/historyAtas'
-    | '/historyBawah'
-    | '/quiz'
-    | '/auth/login'
-    | '/auth/register'
-    | '/user_setting/user_setting'
+  to: '/' | '/auth/login' | '/auth/register'
+  id: '__root__' | '/' | '/auth/login' | '/auth/register'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  HistoryAtasRoute: typeof HistoryAtasRoute
-  HistoryBawahRoute: typeof HistoryBawahRoute
-  QuizRoute: typeof QuizRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
-  User_settingUser_settingRoute: typeof User_settingUser_settingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/quiz': {
-      id: '/quiz'
-      path: '/quiz'
-      fullPath: '/quiz'
-      preLoaderRoute: typeof QuizRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/historyBawah': {
-      id: '/historyBawah'
-      path: '/historyBawah'
-      fullPath: '/historyBawah'
-      preLoaderRoute: typeof HistoryBawahRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/historyAtas': {
-      id: '/historyAtas'
-      path: '/historyAtas'
-      fullPath: '/historyAtas'
-      preLoaderRoute: typeof HistoryAtasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/user_setting/user_setting': {
-      id: '/user_setting/user_setting'
-      path: '/user_setting/user_setting'
-      fullPath: '/user_setting/user_setting'
-      preLoaderRoute: typeof User_settingUser_settingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/register': {
@@ -178,12 +87,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  HistoryAtasRoute: HistoryAtasRoute,
-  HistoryBawahRoute: HistoryBawahRoute,
-  QuizRoute: QuizRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
-  User_settingUser_settingRoute: User_settingUser_settingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
