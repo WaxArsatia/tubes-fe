@@ -1,4 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import Dashboard from "@/components/Dashboard";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export const Route = createFileRoute("/")({
   component: App,
@@ -6,20 +9,10 @@ export const Route = createFileRoute("/")({
 
 function App() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-center bg-gray-900">
-      <h1 className="text-3xl font-bold text-white">Hello, World!</h1>
-      <Link
-        to="/auth/login"
-        className="text-3xl font-bold text-white underline"
-      >
-        Login
-      </Link>
-      <Link
-        to="/auth/register"
-        className="text-3xl font-bold text-white underline"
-      >
-        Register
-      </Link>
-    </div>
+    <>
+      <Header />
+      <Dashboard />
+      <Footer />
+    </>
   );
 }
