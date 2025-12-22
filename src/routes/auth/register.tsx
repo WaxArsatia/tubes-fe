@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Lock, Mail, User, UserPlus } from "lucide-react";
 import { useState } from "react";
-
+import { InputWithIcon } from "@/components/shared/input-with-icon";
+import { Logo } from "@/components/shared/logo";
+import { PasswordStrength } from "@/components/shared/password-strength";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -9,64 +11,32 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { useRegister } from "@/data/auth";
+import { requireGuest } from "@/lib/auth-utils";
+import type { ApiError } from "@/lib/types";
 
 export const Route = createFileRoute("/auth/register")({
+  beforeLoad: async ({ context }) => {
+    // Redirect to dashboard if already authenticated
+    await requireGuest(context.queryClient);
+  },
   component: RegisterPage,
 });
-
-// ============================================================================
-// Logo Component
-// ============================================================================
-function Logo() {
-  return (
-    <div className="flex items-center gap-3">
-      <img
-        src="/assets/logo.svg"
-        alt="Rangkuman Cerdas Logo"
-        className="size-12"
-      />
-      <div className="flex flex-col">
-        <span className="text-lg font-semibold leading-tight tracking-tight font-heading text-foreground">
-          Rangkuman
-        </span>
-        <span className="text-lg font-semibold leading-tight tracking-tight font-heading text-primary">
-          Cerdas
-        </span>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// Input Field Components
-// ============================================================================
-function InputWithIcon({
-  icon: Icon,
-  ...props
-}: Readonly<
-  React.ComponentProps<typeof Input> & {
-    icon: React.ComponentType<{ className?: string }>;
-  }
->) {
-  return (
-    <div className="relative">
-      <Icon className="absolute -translate-y-1/2 left-3 top-1/2 size-5 text-muted-foreground" />
-      <Input className="h-11 pl-11 rounded-xl" {...props} />
-    </div>
-  );
-}
 
 // ============================================================================
 // Register Form Component
 // ============================================================================
 function RegisterForm() {
-  const navigate = Route.useNavigate();
-  const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const router = useRouter();
+  const register = useRegister();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
+  });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [generalError, setGeneralError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | undefined>();
 
   const validatePasswords = (pass: string, confirm: string) => {
@@ -81,29 +51,30 @@ function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!validatePasswords(password, confirmPassword)) {
+    if (!validatePasswords(formData.password, formData.password_confirmation)) {
       return;
     }
 
-    setIsPending(true);
-    setError(null);
+    setFieldErrors({});
+    setGeneralError(null);
 
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get("fullName") as string;
-    const email = formData.get("email") as string;
-
-    // TODO: Implement actual register logic
-    console.log("Register attempt:", { name, email, password });
-
-    try {
-      // Simulate API call - replace with actual auth logic
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      navigate({ to: "/" });
-    } catch {
-      setError("Pendaftaran gagal. Silakan coba lagi.");
-    } finally {
-      setIsPending(false);
-    }
+    register.mutate(formData, {
+      onSuccess: () => {
+        router.navigate({ to: "/dashboard" });
+      },
+      onError: (error) => {
+        // Handle validation errors (422) for field-level display
+        const apiError = error as ApiError;
+        if (apiError.status === 422 && apiError.errors) {
+          const errors: Record<string, string> = {};
+          for (const [field, messages] of Object.entries(apiError.errors)) {
+            errors[field] = messages[0];
+          }
+          setFieldErrors(errors);
+        }
+        // General errors are now handled by toast in mutation
+      },
+    });
   };
 
   return (
@@ -120,9 +91,9 @@ function RegisterForm() {
         </p>
       </div>
 
-      {error && (
+      {generalError && (
         <div className="p-4 text-sm border rounded-xl border-destructive/20 bg-destructive/10 text-destructive">
-          {error}
+          {generalError}
         </div>
       )}
 
@@ -135,9 +106,12 @@ function RegisterForm() {
             name="fullName"
             placeholder="Masukkan nama lengkap kamu"
             autoComplete="name"
-            disabled={isPending}
+            disabled={register.isPending}
             required
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
+          {fieldErrors.name && <FieldError>{fieldErrors.name}</FieldError>}
         </Field>
 
         <Field>
@@ -148,9 +122,14 @@ function RegisterForm() {
             name="email"
             placeholder="Masukkan email kamu"
             autoComplete="email"
-            disabled={isPending}
+            disabled={register.isPending}
             required
+            value={formData.email}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
           />
+          {fieldErrors.email && <FieldError>{fieldErrors.email}</FieldError>}
         </Field>
 
         <Field>
@@ -161,14 +140,21 @@ function RegisterForm() {
             name="password"
             placeholder="Masukkan password kamu"
             autoComplete="new-password"
-            disabled={isPending}
+            disabled={register.isPending}
             required
-            value={password}
+            value={formData.password}
             onChange={(e) => {
-              setPassword(e.target.value);
-              validatePasswords(e.target.value, confirmPassword);
+              const newPassword = e.target.value;
+              setFormData({ ...formData, password: newPassword });
+              validatePasswords(newPassword, formData.password_confirmation);
             }}
           />
+          {formData.password && (
+            <PasswordStrength password={formData.password} />
+          )}
+          {fieldErrors.password && (
+            <FieldError>{fieldErrors.password}</FieldError>
+          )}
         </Field>
 
         <Field>
@@ -179,12 +165,13 @@ function RegisterForm() {
             name="confirmPassword"
             placeholder="Konfirmasi password kamu"
             autoComplete="new-password"
-            disabled={isPending}
+            disabled={register.isPending}
             required
-            value={confirmPassword}
+            value={formData.password_confirmation}
             onChange={(e) => {
-              setConfirmPassword(e.target.value);
-              validatePasswords(password, e.target.value);
+              const newConfirm = e.target.value;
+              setFormData({ ...formData, password_confirmation: newConfirm });
+              validatePasswords(formData.password, newConfirm);
             }}
           />
           {passwordError && <FieldError>{passwordError}</FieldError>}
@@ -194,11 +181,11 @@ function RegisterForm() {
       <Button
         type="submit"
         size="lg"
-        disabled={isPending || !!passwordError}
+        disabled={register.isPending || !!passwordError}
         className="gap-2 font-semibold rounded-xl"
       >
         <UserPlus className="size-5" />
-        {isPending ? "Sedang mendaftar..." : "Daftar"}
+        {register.isPending ? "Sedang mendaftar..." : "Daftar"}
       </Button>
 
       <p className="text-sm text-center text-muted-foreground sm:text-base">
