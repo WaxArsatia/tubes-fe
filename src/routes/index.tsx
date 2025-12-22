@@ -3,63 +3,25 @@ import {
   ArrowRight,
   Check,
   FileQuestion,
-  Hash,
-  MessageSquareText,
   Rocket,
   Sparkles,
   Zap,
 } from "lucide-react";
-
+import { Logo } from "@/components/shared/logo";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { requireGuest } from "@/lib/auth-utils";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
+  beforeLoad: async ({ context }) => {
+    // Redirect to dashboard if already authenticated
+    await requireGuest(context.queryClient);
+  },
   component: LandingPage,
 });
-
-// ============================================================================
-// Logo Component
-// ============================================================================
-function Logo({
-  className,
-  variant = "dark",
-}: Readonly<{ className?: string; variant?: "dark" | "light" }>) {
-  const textColor =
-    variant === "dark" ? "text-foreground" : "text-primary-foreground";
-  const accentColor =
-    variant === "dark" ? "text-primary" : "text-primary-foreground/80";
-
-  return (
-    <div className={cn("flex items-center gap-3", className)}>
-      <img
-        src="/assets/logo.svg"
-        alt="Rangkuman Cerdas Logo"
-        className="size-16"
-      />
-      <div className="flex flex-col">
-        <span
-          className={cn(
-            "font-heading text-xl font-semibold leading-tight tracking-tight",
-            textColor,
-          )}
-        >
-          Rangkuman
-        </span>
-        <span
-          className={cn(
-            "font-heading text-xl font-semibold leading-tight tracking-tight",
-            accentColor,
-          )}
-        >
-          Cerdas
-        </span>
-      </div>
-    </div>
-  );
-}
 
 // ============================================================================
 // Sidebar Component
@@ -68,7 +30,7 @@ function Sidebar() {
   return (
     <aside className="fixed top-0 left-0 z-40 flex flex-col h-screen gap-2 border-r w-80 border-border bg-background">
       <div className="flex flex-col gap-10 px-8 pt-8 pb-4">
-        <Logo />
+        <Logo size="lg" />
 
         <div className="flex flex-col gap-4">
           <Link
@@ -117,9 +79,6 @@ function Sidebar() {
             </FeatureListItem>
             <FeatureListItem>
               Kuis otomatis langsung dari materi kuliah
-            </FeatureListItem>
-            <FeatureListItem>
-              Tanya jawab kontekstual 24/7 tanpa batas
             </FeatureListItem>
           </ul>
         </div>
@@ -274,92 +233,9 @@ function FeaturesSection() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Ekstraksi Kata Kunci */}
-          <Card className="col-span-7 p-0 border shadow-none rounded-3xl border-border bg-card">
-            <CardContent className="flex items-center gap-8 p-8">
-              <div className="flex flex-col gap-5">
-                <div className="flex items-center justify-center bg-purple-100 size-12 rounded-3xl">
-                  <Hash className="text-purple-600 size-6" />
-                </div>
-                <h3 className="font-sans text-xl font-bold text-foreground">
-                  Ekstraksi Kata Kunci
-                </h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  Temukan topik utama dan istilah penting secara otomatis untuk
-                  memudahkan pemetaan materi belajar. Cocok untuk review cepat
-                  sebelum ujian.
-                </p>
-              </div>
-
-              {/* Keyword Tags */}
-              <div className="flex flex-wrap gap-2">
-                <KeywordTag>Machine Learning</KeywordTag>
-                <KeywordTag variant="primary">Neural Networks</KeywordTag>
-                <KeywordTag>Deep Learning</KeywordTag>
-                <KeywordTag>Algorithm</KeywordTag>
-                <KeywordTag variant="purple">
-                  Artificial Intelligence
-                </KeywordTag>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Chat Kontekstual */}
-          <Card className="col-span-5 p-0 border shadow-none rounded-3xl border-border bg-card">
-            <CardContent className="flex flex-col justify-between h-full p-8">
-              <div className="flex flex-col gap-5">
-                <div className="flex items-center justify-center bg-blue-100 size-12 rounded-3xl">
-                  <MessageSquareText className="text-blue-600 size-5" />
-                </div>
-                <h3 className="font-sans text-xl font-extrabold text-foreground">
-                  Chat Kontekstual
-                </h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  Tanya apa saja tentang dokumenmu. AI akan menjawab dengan
-                  referensi halaman yang akurat.
-                </p>
-              </div>
-
-              {/* Avatar Group */}
-              <div className="flex items-center pt-4">
-                <div className="border-2 rounded-full size-8 border-card bg-muted" />
-                <div className="flex items-center justify-center -ml-2 border-2 rounded-full size-8 border-card bg-primary/10">
-                  <span className="text-xs font-bold font-heading text-primary">
-                    AI
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </section>
-  );
-}
-
-function KeywordTag({
-  children,
-  variant = "default",
-}: Readonly<{
-  children: React.ReactNode;
-  variant?: "default" | "primary" | "purple";
-}>) {
-  const variants = {
-    default: "bg-muted text-muted-foreground",
-    primary: "border border-primary/20 bg-primary/10 text-primary",
-    purple: "border border-purple-200 bg-purple-50 text-purple-600",
-  };
-
-  return (
-    <span
-      className={cn(
-        "rounded-lg px-3 py-1.5 text-xs font-medium",
-        variants[variant],
-      )}
-    >
-      {children}
-    </span>
   );
 }
 
@@ -386,7 +262,7 @@ function Footer() {
           <div className="flex gap-20">
             <FooterLinkGroup
               title="Produk"
-              links={["Ringkasan Otomatis", "Quiz Generator", "Chat AI"]}
+              links={["Ringkasan Otomatis", "Quiz Generator"]}
             />
             <FooterLinkGroup
               title="Perusahaan"
@@ -394,7 +270,7 @@ function Footer() {
             />
             <FooterLinkGroup
               title="Legal"
-              links={["Kebijakan Privasi", "Syarat & Ketentuan", "Cookies"]}
+              links={["Kebijakan Privasi", "Syarat & Ketentuan"]}
             />
           </div>
         </div>
